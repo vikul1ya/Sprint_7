@@ -1,65 +1,66 @@
 package ru.practicum.tests;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.junit4.DisplayName;
+import io.qameta.allure.Epic;
+import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import ru.practicum.model.Order;
-import ru.practicum.steps.OrderSteps;
-import ru.practicum.utils.DataGenerator;
+import ru.practicum.steps.AllureSteps;
 
-import java.util.List;
-
+import static org.hamcrest.Matchers.notNullValue;
 import static org.apache.http.HttpStatus.*;
-import static org.hamcrest.Matchers.*;
 
 @RunWith(Parameterized.class)
+@Epic("Тесты на создание заказа")
 public class OrderCreateTest extends BaseTest {
 
-    private final OrderSteps steps = new OrderSteps();
+    private final AllureSteps allureSteps = new AllureSteps();
     private Integer track;
 
     @Parameterized.Parameter()
     public String[] color;
 
-    @Parameterized.Parameter(1)
-    public String description;
-
-    @Parameterized.Parameters(name = "Цвет: {1}")
+    @Parameterized.Parameters(name = "Цвет: {0}")
     public static Object[][] data() {
-        List<String[]> colors = DataGenerator.colorCombinations();
         return new Object[][]{
-                {colors.get(0), "чёрный"},
-                {colors.get(1), "серый"},
-                {colors.get(2), "чёрный и серый"},
-                {colors.get(3), "без цвета"}
+                {new String[]{"BLACK"}},
+                {new String[]{"GREY"}},
+                {new String[]{"BLACK", "GREY"}},
+                {new String[]{}}
         };
     }
 
     @Test
-    @DisplayName("Создание заказа с разными цветами")
-    @Description("Проверка, что заказ создаётся при разных комбинациях цветов")
-    public void shouldCreateOrderWithColor() {
-        Order order = DataGenerator.randomOrder();
+    public void orderCreateTest() {
+        Order order = new Order()
+                .setFirstName("Name")
+                .setLastName("Last")
+                .setAddress("address")
+                .setMetroStation("metro")
+                .setPhone("phone")
+                .setRentTime(5)
+                .setDeliveryDate("2020-06-06")
+                .setComment("comment");
+
         if (color.length > 0) {
-            order.setColor(List.of(color));
+            order.setColor(java.util.Arrays.asList(color));
         }
 
-        var response = steps.createOrder(order);
+        ValidatableResponse response = allureSteps.createOrder(order);
         response
+                .assertThat()
                 .statusCode(SC_CREATED)
                 .body("track", notNullValue());
 
-        track = response.extract().path("track");
+        track = response.extract().body().jsonPath().getInt("track");
     }
 
     @After
     public void tearDown() {
         if (track != null) {
-            steps.cancelOrder(track)
-                    .statusCode(SC_OK);
+            allureSteps.cancelOrder(track);
         }
     }
 }

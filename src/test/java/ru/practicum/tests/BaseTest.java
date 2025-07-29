@@ -10,15 +10,13 @@ import ru.practicum.config.RestConfig;
 public class BaseTest {
 
     @Before
-    public void startUp(){
+    public void startUp() {
         RestAssured.requestSpecification = new RequestSpecBuilder()
                 .setBaseUri(RestConfig.HOST)
                 .setContentType(ContentType.JSON)
                 .build();
 
-        RestAssured.config = RestAssured
-                .config()
+        RestAssured.config = RestAssured.config()
                 .logConfig(LogConfig.logConfig().enableLoggingOfRequestAndResponseIfValidationFails());
-
     }
 }

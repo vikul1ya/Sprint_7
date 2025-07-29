@@ -2,6 +2,7 @@ package ru.practicum.steps;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
+import ru.practicum.config.Endpoints;
 import ru.practicum.config.RestConfig;
 import ru.practicum.model.Order;
 
@@ -15,7 +16,7 @@ public class OrderSteps {
                 .baseUri(RestConfig.HOST)
                 .body(order)
                 .when()
-                .post("/api/v1/orders")
+                .post(Endpoints.ORDERS)
                 .then();
     }
 
@@ -24,7 +25,17 @@ public class OrderSteps {
                 .contentType(ContentType.JSON)
                 .baseUri(RestConfig.HOST)
                 .when()
-                .get("/api/v1/orders")
+                .get(Endpoints.ORDERS)
+                .then();
+    }
+
+    public ValidatableResponse cancelOrder(Integer track) {
+        return given()
+                .contentType(ContentType.JSON)
+                .baseUri(RestConfig.HOST)
+                .body("{\"track\": " + track + "}")
+                .when()
+                .put(Endpoints.ORDER_CANCEL)
                 .then();
     }
 }
