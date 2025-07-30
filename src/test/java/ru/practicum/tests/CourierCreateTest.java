@@ -37,26 +37,34 @@ public class CourierCreateTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("Нельзя создать курьера без обязательных полей")
-    @Description("Проверка, что отсутствие любого из трёх полей (login, password, firstName) вызывает ошибку")
-    public void shouldNotCreateCourierWithMissingRequiredFieldsTest() {
-        // Сценарий 1: Нет логина
+    @DisplayName("Нельзя создать курьера без логина")
+    @Description("Проверка, что отсутствие login вызывает ошибку")
+    public void shouldNotCreateCourierWithoutLoginTest() {
+
         Courier noLogin = new Courier()
                 .setPassword("password")
                 .setFirstName("Name");
         allureSteps.createCourier(noLogin)
                 .statusCode(SC_BAD_REQUEST)
                 .body("message", Matchers.containsString("Недостаточно данных для создания учетной записи"));
+    }
 
-        // Сценарий 2: Нет пароля
-        Courier noPassword = new Courier()
-                .setLogin("login")
-                .setFirstName("Name");
-        allureSteps.createCourier(noPassword)
-                .statusCode(SC_BAD_REQUEST)
-                .body("message", Matchers.containsString("Недостаточно данных для создания учетной записи"));
+        @Test
+        @DisplayName("Нельзя создать курьера без пароля")
+        @Description("Проверка, что отсутствие password вызывает ошибку")
+        public void shouldNotCreateCourierWithoutPasswordTest() {
+            Courier noPassword = new Courier()
+                    .setLogin("login")
+                    .setFirstName("Name");
+            allureSteps.createCourier(noPassword)
+                    .statusCode(SC_BAD_REQUEST)
+                    .body("message", Matchers.containsString("Недостаточно данных для создания учетной записи"));
+        }
 
-        // Сценарий 3: Нет имени
+    @Test
+    @DisplayName("Нельзя создать курьера без имени")
+    @Description("Проверка, что отсутствие firstName  вызывает ошибку")
+    public void shouldNotCreateCourierWithoutFirstNameTest() {
         Courier noFirstName = new Courier()
                 .setLogin("login")
                 .setPassword("password");
